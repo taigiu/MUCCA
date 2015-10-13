@@ -9,6 +9,8 @@ source of root, needed for the GUI later
 Train:
 
     r99t Train.cxx\(\"BDTG\"\)
+    r99t TrainMulti.cxx\(\"BDTG\"\)
+    r99t TrainMulti.cxx\(\"MLP\"\)
 
 Test:
 
