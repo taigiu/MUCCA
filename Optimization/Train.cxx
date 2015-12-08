@@ -44,7 +44,11 @@
 #include "TSystem.h"
 #include "TROOT.h"
 
-#include "TMVAGui.C"
+// #include "TMVAGui.C"
+#include "TMVA/Tools.h"
+#include "TMVA/Factory.h"
+#include "TMVA/TMVAGui.h"
+
 
 #if not defined(__CINT__) || defined(__MAKECINT__)
 // needs to be included when makecint runs (ACLIC)
@@ -52,8 +56,10 @@
 #include "TMVA/Tools.h"
 #endif
 
-void Train( TString myMethodList = "" )
-{
+using namespace TMVA;
+
+
+void Train( int whichBkg = 1,  TString myMethodList = "" ) {
    // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
    // if you use your private .rootrc, or run from a different directory, please copy the
    // corresponding lines from .rootrc
@@ -160,7 +166,7 @@ void Train( TString myMethodList = "" )
    // --- Here the preparation phase begins
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
- TString outfileName( "TMVA.root" );
+ TString outfileName( "TMVA-" + std::to_string(whichBkg) + ".root" );
  TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -189,13 +195,20 @@ void Train( TString myMethodList = "" )
 //  factory->AddVariable( "var3",                "Variable 3", "units", 'F' );
 //  factory->AddVariable( "var4",                "Variable 4", "units", 'F' );
 
+ factory->AddVariable( "std_vector_lepton_pt[0]", 'F' );
+ factory->AddVariable( "std_vector_lepton_pt[1]", 'F' );
  factory->AddVariable( "mll", 'F' );
- factory->AddVariable( "mth", 'F' );
- factory->AddVariable( "ptll", 'F' );
- factory->AddVariable( "pt1", 'F' );
- factory->AddVariable( "pt2", 'F' );
  factory->AddVariable( "dphill", 'F' );
- factory->AddVariable( "pfmet", 'F' );
+ factory->AddVariable( "yll", 'F' );
+ factory->AddVariable( "ptll", 'F' );
+ 
+//  factory->AddVariable( "mll", 'F' );
+//  factory->AddVariable( "mth", 'F' );
+//  factory->AddVariable( "ptll", 'F' );
+//  factory->AddVariable( "pt1", 'F' );
+//  factory->AddVariable( "pt2", 'F' );
+//  factory->AddVariable( "dphill", 'F' );
+//  factory->AddVariable( "pfmet", 'F' );
 
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
@@ -213,17 +226,27 @@ void Train( TString myMethodList = "" )
    
  TString fname;
   
- fname = Form ("/home/amassiro/Latinos/Shape/tree_skim_all/nominals/latinogg2vv_Hw25_SigTail_8TeV.root");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_GluGluHToTauTau_M125.root");
  TFile *inputS1 = TFile::Open( fname );
  TTree *signal1 = (TTree*) inputS1->Get("latino");
- fname = Form ("/home/amassiro/Latinos/Shape/tree_skim_all/nominals/latinogg2vv_Hw25_SigShoulder_8TeV.root");
- TFile *inputS2 = TFile::Open( fname );
- TTree *signal2     = (TTree*) inputS2->Get("latino");
-
- fname = Form ("/home/amassiro/Latinos/Shape/tree_skim_all/nominals/latinogg2vv_Hw25_SigOnPeak_8TeV.root");
+ 
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_WWTo2L2Nu.root");
  TFile *inputB1 = TFile::Open( fname );
  TTree *background1 = (TTree*) inputB1->Get("latino");
-
+ 
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-10to50.root");
+ //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-5to50-LO.root");
+ TChain *background2 = new TChain("latino");
+ background2->Add(fname);
+ //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-50.root");
+ //  background2->Add(fname);
+ 
+ //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTJets.root");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTTo2L2Nu.root");
+ TFile *inputB3 = TFile::Open( fname );
+ TTree *background3 = (TTree*) inputB3->Get("latino");
+ 
+ 
    // --- Register the training and test trees
 //  TTree *signal     = (TTree*)input->Get("TreeS");
 //  TTree *background = (TTree*)input->Get("TreeB");
@@ -234,10 +257,11 @@ void Train( TString myMethodList = "" )
    
    // You can add an arbitrary number of signal or background trees
  factory->AddSignalTree(    signal1, signalWeight );
- factory->AddSignalTree(    signal2, signalWeight );
 
- factory->AddBackgroundTree( background1, backgroundWeight );
-   
+ if (whichBkg == 1)  factory->AddBackgroundTree( background1, backgroundWeight );
+ if (whichBkg == 2)  factory->AddBackgroundTree( background2, backgroundWeight );
+ if (whichBkg == 3)  factory->AddBackgroundTree( background3, backgroundWeight );
+ 
   //---- global weight
  factory->SetWeightExpression("baseW");
 
@@ -287,9 +311,17 @@ void Train( TString myMethodList = "" )
 //  factory->SetBackgroundWeightExpression( "weight" );
 
    // Apply additional cuts on the signal and background samples (can be different)
- TCut mycuts = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
- TCut mycutb = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycutb = "abs(var1)<0.5";
+//  TCut mycuts = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+//  TCut mycutb = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycutb = "abs(var1)<0.5";
 
+ TCut mycuts = "mll>10 && std_vector_lepton_pt[0]>20 \
+                && std_vector_lepton_pt[1]>10 && (channel==2 || channel==3) \
+               "; 
+ 
+ 
+ TCut mycutb = mycuts;
+ 
+ 
    // Tell the factory how to use the training and testing events
  //
    // If no numbers of events are given, half of the events in the tree are used 
@@ -507,11 +539,11 @@ void Train( TString myMethodList = "" )
  outputFile->Close();
 
  std::string toDo;
- toDo = "rm -r Weights-ggH/";
+ toDo = "rm -r Weights-" + std::to_string(whichBkg) + "/";
  std::cerr << "toDo = " << toDo << std::endl;
  system (toDo.c_str()); 
 
- toDo = "mv weights Weights-ggH/";
+ toDo = "mv weights Weights-" + std::to_string(whichBkg) + "/";
  std::cerr << "toDo = " << toDo << std::endl;
  system (toDo.c_str()); 
 

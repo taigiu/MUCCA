@@ -23,6 +23,10 @@
 #include "TMVA/Factory.h"
 #include "TMVA/TMVAMultiClassGui.h"
 
+// #include "Tools.h"
+// #include "Factory.h"
+// #include "TMVAMultiClassGui.h"
+
 
 using namespace TMVA;
 
@@ -78,37 +82,66 @@ void TrainMulti( TString myMethodList = "" ) {
  factory->AddVariable( "std_vector_lepton_pt[0]", 'F' );
  factory->AddVariable( "std_vector_lepton_pt[1]", 'F' );
  factory->AddVariable( "mll", 'F' );
+ factory->AddVariable( "dphill", 'F' );
+ factory->AddVariable( "yll", 'F' );
+ factory->AddVariable( "ptll", 'F' );
+//  factory->AddVariable( "pfType1Met", 'F' );
  
+//  factory->AddVariable( "bvetoMY :=  (std_vector_jet_pt.at(0) > 15) * std_vector_jet_csvv2ivf.at(0)", 'F' );
+//  factory->AddVariable( "bvetoMY :=  (std_vector_jet_pt[0] > 15) * std_vector_jet_csvv2ivf[0]", 'F' );
+//  factory->AddVariable( "bvetoMY :=  (std_vector_jet_pt[0] > 15) ", 'F' );
+//   factory->AddVariable( "bvetoMY :=  std_vector_jet_csvv2ivf[0]", 'F' );
+//  factory->AddVariable( "bvetoMY :=  (std_vector_jet_pt[0] > 15) * (std_vector_jet_csvv2ivf[0])", 'F' );
  
+ //  
+//  factory->AddVariable( "bvetoMY :=  mll * pt2", 'F' );
+//  factory->AddVariable( "bvetoMY :=  (mll>20) * pt2", 'F' );
  
+ //  factory->AddVariable( "bveto0 :=  std_vector_jet_pt[0] + std_vector_jet_pt[1]", 'F' );
+//  factory->AddVariable( "std_vector_jet_pt[0]", 'F' );
+//  factory->AddVariable( "std_vector_jet_pt[1]", 'F' );
  
+
  
  
  
  TString fname;
  
- fname = Form ("/media/amassiro/SAMSUNG/data/Latinos/mc/latino_GluGluHToTauTau_M125.root");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_GluGluHToTauTau_M125.root");
  TFile *inputS1 = TFile::Open( fname );
  TTree *signal1 = (TTree*) inputS1->Get("latino");
 
- fname = Form ("/media/amassiro/SAMSUNG/data/Latinos/mc/latino_WWTo2L2Nu.root");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_WWTo2L2Nu.root");
  TFile *inputB1 = TFile::Open( fname );
  TTree *background1 = (TTree*) inputB1->Get("latino");
  
- fname = Form ("/media/amassiro/SAMSUNG/data/Latinos/mc/latino_WZ.root");
- TFile *inputB2 = TFile::Open( fname );
- TTree *background2 = (TTree*) inputB1->Get("latino");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-10to50.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-5to50-LO.root");
+ TChain *background2 = new TChain("latino");
+ background2->Add(fname);
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-50.root");
+//  background2->Add(fname);
  
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTJets.root");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTTo2L2Nu.root");
+ TFile *inputB3 = TFile::Open( fname );
+ TTree *background3 = (TTree*) inputB3->Get("latino");
  
  gROOT->cd( outfileName+TString(":/") );
  factory->AddTree    (signal1,"Signal");
- factory->AddTree    (background1,"bg1");
- factory->AddTree    (background2,"bg2");
+ factory->AddTree    (background1,"WW");
+ factory->AddTree    (background2,"DY");
+ factory->AddTree    (background3,"Top");
  
  //---- global weight
- factory->SetWeightExpression("baseW");
+//  factory->SetWeightExpression("baseW*puW*GEN_weight_SM/abs(GEN_weight_SM)");
+ factory->SetWeightExpression("baseW*puW");
  
- TCut mycut = "mll>12 && std_vector_lepton_pt[0]>0 && std_vector_lepton_pt[1]>0"; 
+ TCut mycut = "mll>10 && std_vector_lepton_pt[0]>20 \
+               && std_vector_lepton_pt[1]>10 && (channel==2 || channel==3) \
+               && njet==0 \
+               && ( std_vector_jet_pt[0] < 15 || std_vector_jet_csvv2ivf[0] < 0.605 ) \
+              "; 
  factory->PrepareTrainingAndTestTree( mycut, "SplitMode=Random:NormMode=NumEvents:!V" );
  
  if (Use["BDTG"]) // gradient boosted decision trees
