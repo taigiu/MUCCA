@@ -160,13 +160,25 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
    Use[regMethod] = 1;
   }
  }
+ else { //---- deactivate all
+  for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) it->second = 0;
+ }
+ 
 
    // --------------------------------------------------------------------------------------------------
 
    // --- Here the preparation phase begins
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
- TString outfileName( "TMVA-" + std::to_string(whichBkg) + ".root" );
+ TString outfileName;
+ 
+ if (myMethodList != "") {
+  outfileName = "TMVA-" + std::to_string(whichBkg) + ".root";
+ }
+ else {
+  outfileName = "TMVA-" + std::to_string(whichBkg) + "-variables.root" ;
+ }
+ 
  TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -180,7 +192,8 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
    // All TMVA output can be suppressed by removing the "!" (not) in
    // front of the "Silent" argument in the option string
  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
-                                             "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
+                                             "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification" );
+//                                              "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
 
    // If you wish to modify default settings
    // (please check "src/Config.h" to see all available global options)
@@ -202,15 +215,17 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  factory->AddVariable( "yll", 'F' );
  factory->AddVariable( "ptll", 'F' );
  
-//  factory->AddVariable( "mll", 'F' );
-//  factory->AddVariable( "mth", 'F' );
-//  factory->AddVariable( "ptll", 'F' );
-//  factory->AddVariable( "pt1", 'F' );
-//  factory->AddVariable( "pt2", 'F' );
-//  factory->AddVariable( "dphill", 'F' );
-//  factory->AddVariable( "pfmet", 'F' );
-
-
+ factory->AddVariable( "dphilmet1", 'F' );
+ factory->AddVariable( "dphilmet2", 'F' );
+ factory->AddVariable( "dphilmet",  'F' );  //---- minimum among the two
+ 
+ if (myMethodList != "") {
+  factory->AddSpectator( "mth",  'F' );  //---- used in shape analysis, not here
+ }
+ else {
+  factory->AddVariable( "mth",  'F' );  //---- used in shape analysis, not here
+ }
+ 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
    // input variables, the response values of all trained MVAs, and the spectator variables
@@ -226,32 +241,34 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
    
  TString fname;
   
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_GluGluHToTauTau_M125.root");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_GluGluHToTauTau_M125.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_GluGluHToTauTau_M125.root");
  TFile *inputS1 = TFile::Open( fname );
  TTree *signal1 = (TTree*) inputS1->Get("latino");
  
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_WWTo2L2Nu.root");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WWTo2L2Nu.root");
  TFile *inputB1 = TFile::Open( fname );
  TTree *background1 = (TTree*) inputB1->Get("latino");
  
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-10to50.root");
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_DYJetsToLL_M-10to50.root");
  //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-5to50-LO.root");
  TChain *background2 = new TChain("latino");
  background2->Add(fname);
- //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-50.root");
- //  background2->Add(fname);
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-50.root");
+ background2->Add(fname);
  
  //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTJets.root");
  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTTo2L2Nu.root");
  TFile *inputB3 = TFile::Open( fname );
  TTree *background3 = (TTree*) inputB3->Get("latino");
  
+ fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WZTo3LNu.root");
+ TFile *inputB4 = TFile::Open( fname );
+ TTree *background4 = (TTree*) inputB4->Get("latino");
  
-   // --- Register the training and test trees
-//  TTree *signal     = (TTree*)input->Get("TreeS");
-//  TTree *background = (TTree*)input->Get("TreeB");
-   
-   // global event weights per tree (see below for setting event-wise weights)
+ // --- Register the training and test trees
+  
+ // global event weights per tree (see below for setting event-wise weights)
  Double_t signalWeight     = 1.0;
  Double_t backgroundWeight = 1.0;
    
@@ -261,58 +278,22 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  if (whichBkg == 1)  factory->AddBackgroundTree( background1, backgroundWeight );
  if (whichBkg == 2)  factory->AddBackgroundTree( background2, backgroundWeight );
  if (whichBkg == 3)  factory->AddBackgroundTree( background3, backgroundWeight );
+ if (whichBkg == 4)  factory->AddBackgroundTree( background4, backgroundWeight );
  
   //---- global weight
- factory->SetWeightExpression("baseW");
+ factory->SetWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
 
  
-   // To give different trees for training and testing, do as follows:
-   //    factory->AddSignalTree( signalTrainingTree, signalTrainWeight, "Training" );
-   //    factory->AddSignalTree( signalTestTree,     signalTestWeight,  "Test" );
-   
-   // Use the following code instead of the above two or four lines to add signal and background
-   // training and test events "by hand"
-   // NOTE that in this case one should not give expressions (such as "var1+var2") in the input
-   //      variable definition, but simply compute the expression before adding the event
- //
-   //     // --- begin ----------------------------------------------------------
-   //     std::vector<Double_t> vars( 4 ); // vector has size of number of input variables
-   //     Float_t  treevars[4], weight;
- //     
-   //     // Signal
-   //     for (UInt_t ivar=0; ivar<4; ivar++) signal->SetBranchAddress( Form( "var%i", ivar+1 ), &(treevars[ivar]) );
-   //     for (UInt_t i=0; i<signal->GetEntries(); i++) {
-   //        signal->GetEntry(i);
-   //        for (UInt_t ivar=0; ivar<4; ivar++) vars[ivar] = treevars[ivar];
-   //        // add training and test events; here: first half is training, second is testing
-   //        // note that the weight can also be event-wise
-   //        if (i < signal->GetEntries()/2.0) factory->AddSignalTrainingEvent( vars, signalWeight );
-   //        else                              factory->AddSignalTestEvent    ( vars, signalWeight );
-   //     }
- //   
-   //     // Background (has event weights)
-   //     background->SetBranchAddress( "weight", &weight );
-   //     for (UInt_t ivar=0; ivar<4; ivar++) background->SetBranchAddress( Form( "var%i", ivar+1 ), &(treevars[ivar]) );
-   //     for (UInt_t i=0; i<background->GetEntries(); i++) {
-   //        background->GetEntry(i);
-   //        for (UInt_t ivar=0; ivar<4; ivar++) vars[ivar] = treevars[ivar];
-   //        // add training and test events; here: first half is training, second is testing
-   //        // note that the weight can also be event-wise
-   //        if (i < background->GetEntries()/2) factory->AddBackgroundTrainingEvent( vars, backgroundWeight*weight );
-   //        else                                factory->AddBackgroundTestEvent    ( vars, backgroundWeight*weight );
-   //     }
-         // --- end ------------------------------------------------------------
- //
    // --- end of tree registration 
 
-   // Set individual event weights (the variables must exist in the original TTree)
-   //    for signal    : factory->SetSignalWeightExpression    ("weight1*weight2");
-   //    for background: factory->SetBackgroundWeightExpression("weight1*weight2");
-//  factory->SetBackgroundWeightExpression( "weight" );
+ // Set individual event weights (the variables must exist in the original TTree)
+ //    for signal    : factory->SetSignalWeightExpression    ("weight1*weight2");
+ //    for background: factory->SetBackgroundWeightExpression("weight1*weight2");
+ //    factory->SetBackgroundWeightExpression( "weight" );
 
-   // Apply additional cuts on the signal and background samples (can be different)
-//  TCut mycuts = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
-//  TCut mycutb = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycutb = "abs(var1)<0.5";
+ // Apply additional cuts on the signal and background samples (can be different)
+ //  TCut mycuts = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+ //  TCut mycutb = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycutb = "abs(var1)<0.5";
 
  TCut mycuts = "mll>10 && std_vector_lepton_pt[0]>20 \
                 && std_vector_lepton_pt[1]>10 && (channel==2 || channel==3) \
@@ -330,17 +311,16 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
    // To also specify the number of testing events, use:
    //    factory->PrepareTrainingAndTestTree( mycut,
    //                                         "NSigTrain=3000:NBkgTrain=3000:NSigTest=3000:NBkgTest=3000:SplitMode=Random:!V" );
- factory->PrepareTrainingAndTestTree( mycuts, mycutb,
-                                      "nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
-
+//  factory->PrepareTrainingAndTestTree( mycuts, mycutb,  "nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
+ factory->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:!V");
+ 
    // ---- Book MVA methods
- //
    // Please lookup the various method configuration options in the corresponding cxx files, eg:
    // src/MethoCuts.cxx, etc, or here: http://tmva.sourceforge.net/optionRef.html
    // it is possible to preset ranges in the option string in which the cut optimisation should be done:
    // "...:CutRangeMin[2]=-1:CutRangeMax[2]=1"...", where [2] is the third input variable
 
-   // Cut optimisation
+ // Cut optimisation
  if (Use["Cuts"])
   factory->BookMethod( TMVA::Types::kCuts, "Cuts",
                        "!H:!V:FitMethod=MC:EffSel:SampleSize=200000:VarProp=FSmart" );
@@ -361,35 +341,35 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
   factory->BookMethod( TMVA::Types::kCuts, "CutsSA",
                        "!H:!V:FitMethod=SA:EffSel:MaxCalls=150000:KernelTemp=IncAdaptive:InitialTemp=1e+6:MinTemp=1e-6:Eps=1e-10:UseDefaultScale" );
 
-   // Likelihood ("naive Bayes estimator")
+ // Likelihood ("naive Bayes estimator")
  if (Use["Likelihood"])
   factory->BookMethod( TMVA::Types::kLikelihood, "Likelihood",
                        "H:!V:TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmoothBkg[1]=10:NSmooth=1:NAvEvtPerBin=50" );
 
-   // Decorrelated likelihood
+ // Decorrelated likelihood
  if (Use["LikelihoodD"])
   factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodD",
                        "!H:!V:TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
 
-   // PCA-transformed likelihood
+ // PCA-transformed likelihood
  if (Use["LikelihoodPCA"])
   factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodPCA",
                        "!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=PCA" ); 
 
-   // Use a kernel density estimator to approximate the PDFs
+ // Use a kernel density estimator to approximate the PDFs
  if (Use["LikelihoodKDE"])
   factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodKDE",
                        "!H:!V:!TransformOutput:PDFInterpol=KDE:KDEtype=Gauss:KDEiter=Adaptive:KDEFineFactor=0.3:KDEborder=None:NAvEvtPerBin=50" ); 
 
-   // Use a variable-dependent mix of splines and kernel density estimator
+ // Use a variable-dependent mix of splines and kernel density estimator
  if (Use["LikelihoodMIX"])
   factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodMIX",
                        "!H:!V:!TransformOutput:PDFInterpolSig[0]=KDE:PDFInterpolBkg[0]=KDE:PDFInterpolSig[1]=KDE:PDFInterpolBkg[1]=KDE:PDFInterpolSig[2]=Spline2:PDFInterpolBkg[2]=Spline2:PDFInterpolSig[3]=Spline2:PDFInterpolBkg[3]=Spline2:KDEtype=Gauss:KDEiter=Nonadaptive:KDEborder=None:NAvEvtPerBin=50" ); 
 
-   // Test the multi-dimensional probability density estimator
-   // here are the options strings for the MinMax and RMS methods, respectively:
-   //      "!H:!V:VolumeRangeMode=MinMax:DeltaFrac=0.2:KernelEstimator=Gauss:GaussSigma=0.3" );
-   //      "!H:!V:VolumeRangeMode=RMS:DeltaFrac=3:KernelEstimator=Gauss:GaussSigma=0.3" );
+ // Test the multi-dimensional probability density estimator
+ // here are the options strings for the MinMax and RMS methods, respectively:
+ //      "!H:!V:VolumeRangeMode=MinMax:DeltaFrac=0.2:KernelEstimator=Gauss:GaussSigma=0.3" );
+ //      "!H:!V:VolumeRangeMode=RMS:DeltaFrac=3:KernelEstimator=Gauss:GaussSigma=0.3" );
  if (Use["PDERS"])
   factory->BookMethod( TMVA::Types::kPDERS, "PDERS",
                        "!H:!V:NormTree=T:VolumeRangeMode=Adaptive:KernelEstimator=Gauss:GaussSigma=0.3:NEventsMin=400:NEventsMax=600" );
@@ -402,7 +382,7 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
   factory->BookMethod( TMVA::Types::kPDERS, "PDERSPCA",
                        "!H:!V:VolumeRangeMode=Adaptive:KernelEstimator=Gauss:GaussSigma=0.3:NEventsMin=400:NEventsMax=600:VarTransform=PCA" );
 
-   // Multi-dimensional likelihood estimator using self-adapting phase-space binning
+ // Multi-dimensional likelihood estimator using self-adapting phase-space binning
  if (Use["PDEFoam"])
   factory->BookMethod( TMVA::Types::kPDEFoam, "PDEFoam",
                        "!H:!V:SigBgSeparate=F:TailCut=0.001:VolFrac=0.0666:nActiveCells=500:nSampl=2000:nBin=5:Nmin=100:Kernel=None:Compress=T" );
@@ -411,33 +391,33 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
   factory->BookMethod( TMVA::Types::kPDEFoam, "PDEFoamBoost",
                        "!H:!V:Boost_Num=30:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T" );
 
-   // K-Nearest Neighbour classifier (KNN)
+ // K-Nearest Neighbour classifier (KNN)
  if (Use["KNN"])
   factory->BookMethod( TMVA::Types::kKNN, "KNN",
                        "H:nkNN=20:ScaleFrac=0.8:SigmaFact=1.0:Kernel=Gaus:UseKernel=F:UseWeight=T:!Trim" );
 
-   // H-Matrix (chi2-squared) method
+ // H-Matrix (chi2-squared) method
  if (Use["HMatrix"])
   factory->BookMethod( TMVA::Types::kHMatrix, "HMatrix", "!H:!V:VarTransform=None" );
 
-   // Linear discriminant (same as Fisher discriminant)
+ // Linear discriminant (same as Fisher discriminant)
  if (Use["LD"])
   factory->BookMethod( TMVA::Types::kLD, "LD", "H:!V:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10" );
 
-   // Fisher discriminant (same as LD)
+ // Fisher discriminant (same as LD)
  if (Use["Fisher"])
   factory->BookMethod( TMVA::Types::kFisher, "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10" );
 
-   // Fisher with Gauss-transformed input variables
+ // Fisher with Gauss-transformed input variables
  if (Use["FisherG"])
   factory->BookMethod( TMVA::Types::kFisher, "FisherG", "H:!V:VarTransform=Gauss" );
 
-   // Composite classifier: ensemble (tree) of boosted Fisher classifiers
+ // Composite classifier: ensemble (tree) of boosted Fisher classifiers
  if (Use["BoostedFisher"])
   factory->BookMethod( TMVA::Types::kFisher, "BoostedFisher", 
                        "H:!V:Boost_Num=20:Boost_Transform=log:Boost_Type=AdaBoost:Boost_AdaBoostBeta=0.2:!Boost_DetailedMonitoring" );
 
-   // Function discrimination analysis (FDA) -- test of various fitters - the recommended one is Minuit (or GA or SA)
+ // Function discrimination analysis (FDA) -- test of various fitters - the recommended one is Minuit (or GA or SA)
  if (Use["FDA_MC"])
   factory->BookMethod( TMVA::Types::kFDA, "FDA_MC",
                        "H:!V:Formula=(0)+(1)*x0+(2)*x1+(3)*x2+(4)*x3:ParRanges=(-1,1);(-10,10);(-10,10);(-10,10);(-10,10):FitMethod=MC:SampleSize=100000:Sigma=0.1" );
@@ -462,7 +442,7 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
   factory->BookMethod( TMVA::Types::kFDA, "FDA_MCMT",
                        "H:!V:Formula=(0)+(1)*x0+(2)*x1+(3)*x2+(4)*x3:ParRanges=(-1,1);(-10,10);(-10,10);(-10,10);(-10,10):FitMethod=MC:Converger=MINUIT:ErrorLevel=1:PrintLevel=-1:FitStrategy=0:!UseImprove:!UseMinos:SetBatch:SampleSize=20" );
 
-   // TMVA ANN: MLP (recommended ANN) -- all ANNs in TMVA are Multilayer Perceptrons
+ // TMVA ANN: MLP (recommended ANN) -- all ANNs in TMVA are Multilayer Perceptrons
  if (Use["MLP"])
   factory->BookMethod( TMVA::Types::kMLP, "MLP", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:!UseRegulator" );
 
@@ -472,19 +452,19 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  if (Use["MLPBNN"])
   factory->BookMethod( TMVA::Types::kMLP, "MLPBNN", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5:TrainingMethod=BFGS:UseRegulator" ); // BFGS training with bayesian regulators
 
-   // CF(Clermont-Ferrand)ANN
+ // CF(Clermont-Ferrand)ANN
  if (Use["CFMlpANN"])
   factory->BookMethod( TMVA::Types::kCFMlpANN, "CFMlpANN", "!H:!V:NCycles=2000:HiddenLayers=N+1,N"  ); // n_cycles:#nodes:#nodes:...  
 
-   // Tmlp(Root)ANN
+ // Tmlp(Root)ANN
  if (Use["TMlpANN"])
   factory->BookMethod( TMVA::Types::kTMlpANN, "TMlpANN", "!H:!V:NCycles=200:HiddenLayers=N+1,N:LearningMethod=BFGS:ValidationFraction=0.3"  ); // n_cycles:#nodes:#nodes:...
 
-   // Support Vector Machine
+ // Support Vector Machine
  if (Use["SVM"])
   factory->BookMethod( TMVA::Types::kSVM, "SVM", "Gamma=0.25:Tol=0.001:VarTransform=Norm" );
 
-   // Boosted Decision Trees
+ // Boosted Decision Trees
  if (Use["BDTG"]) // Gradient Boost
   factory->BookMethod( TMVA::Types::kBDT, "BDTG",
                        "!H:!V:NTrees=1000:MinNodeSize=1.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=20:MaxDepth=5" );
@@ -506,7 +486,7 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
   factory->BookMethod( TMVA::Types::kBDT, "BDTMitFisher",
                        "!H:!V:NTrees=50:MinNodeSize=2.5%:UseFisherCuts:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20" );
 
-   // RuleFit -- TMVA implementation of Friedman's method
+ // RuleFit -- TMVA implementation of Friedman's method
  if (Use["RuleFit"])
   factory->BookMethod( TMVA::Types::kRuleFit, "RuleFit",
                        "H:!V:RuleFitModule=RFTMVA:Model=ModRuleLinear:MinImp=0.001:RuleMinDist=0.001:NTrees=20:fEventsMin=0.01:fEventsMax=0.5:GDTau=-1.0:GDTauPrec=0.01:GDStep=0.01:GDNSteps=10000:GDErrScale=1.02" );
@@ -524,18 +504,21 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
 
    // ---- Now you can tell the factory to train, test, and evaluate the MVAs
 
-   // Train MVAs using the set of training events
+ // Train MVAs using the set of training events
  factory->TrainAllMethods();
 
-   // ---- Evaluate all MVAs using the set of test events
+ // ---- Evaluate all MVAs using the set of test events
  factory->TestAllMethods();
 
-   // ----- Evaluate and compare performance of all configured MVAs
+ // ----- Evaluate and compare performance of all configured MVAs
  factory->EvaluateAllMethods();
 
-   // --------------------------------------------------------------
+ // ---- plot also spectators
+//  factory->EvaluateAllVariables();  ----> NOT supported anymore!
+ 
+ // --------------------------------------------------------------
 
-   // Save the output
+ // Save the output
  outputFile->Close();
 
  std::string toDo;
@@ -554,6 +537,7 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
 
  delete factory;
 
-   // Launch the GUI for the root macros
- if (!gROOT->IsBatch()) TMVAGui( outfileName );
+ // Launch the GUI for the root macros
+//  if (!gROOT->IsBatch()) TMVAGui( outfileName );
 }
+
