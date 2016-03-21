@@ -26,6 +26,7 @@ Train:
     r99t -q Train.cxx\(2\)
     r99t -q Train.cxx\(3\)
     r99t -q Train.cxx\(4\)
+    r99t -q Train.cxx\(5\)
 
     
     r99t TrainMulti.cxx\(\"BDTG\"\)
@@ -42,7 +43,18 @@ Test:
     r99t TMVAGui.C\(\"TMVA-1-variables.root\"\)
     r99t TMVAGui.C\(\"TMVA-2-variables.root\"\)
     r99t TMVAGui.C\(\"TMVA-3-variables.root\"\)
+    r99t TMVAGui.C\(\"TMVA-4-variables.root\"\)
+    r99t TMVAGui.C\(\"TMVA-5-variables.root\"\)
 
+    
+To run gardener:
+
+    cp Weights-1/TMVAClassification_BDTG.weights.xml   /afs/cern.ch/user/a/amassiro/Framework/CMSSW_7_6_3/src/LatinoAnalysis/Gardener/python/data/mucca/TMVAClassification_BDTG.weights.bkg1.xml
+    cp Weights-2/TMVAClassification_BDTG.weights.xml   /afs/cern.ch/user/a/amassiro/Framework/CMSSW_7_6_3/src/LatinoAnalysis/Gardener/python/data/mucca/TMVAClassification_BDTG.weights.bkg2.xml
+    cp Weights-3/TMVAClassification_BDTG.weights.xml   /afs/cern.ch/user/a/amassiro/Framework/CMSSW_7_6_3/src/LatinoAnalysis/Gardener/python/data/mucca/TMVAClassification_BDTG.weights.bkg3.xml
+    cp Weights-4/TMVAClassification_BDTG.weights.xml   /afs/cern.ch/user/a/amassiro/Framework/CMSSW_7_6_3/src/LatinoAnalysis/Gardener/python/data/mucca/TMVAClassification_BDTG.weights.bkg4.xml
+    cp Weights-5/TMVAClassification_BDTG.weights.xml   /afs/cern.ch/user/a/amassiro/Framework/CMSSW_7_6_3/src/LatinoAnalysis/Gardener/python/data/mucca/TMVAClassification_BDTG.weights.bkg5.xml
+    
     
 where:
 
