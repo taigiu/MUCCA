@@ -19,7 +19,14 @@ Train:
     r99t -q Train.cxx\(1,\"BDTG\"\)
     r99t -q Train.cxx\(2,\"BDTG\"\)
     r99t -q Train.cxx\(3,\"BDTG\"\)
+    r99t -q Train.cxx\(4,\"BDTG\"\)
+    r99t -q Train.cxx\(5,\"BDTG\"\)
     
+    r99t -q Train.cxx\(1\)
+    r99t -q Train.cxx\(2\)
+    r99t -q Train.cxx\(3\)
+    r99t -q Train.cxx\(4\)
+
     
     r99t TrainMulti.cxx\(\"BDTG\"\)
     r99t TrainMulti.cxx\(\"MLP\"\)
@@ -29,8 +36,14 @@ Test:
     r99t TMVAGui.C\(\"TMVA-1.root\"\)
     r99t TMVAGui.C\(\"TMVA-2.root\"\)
     r99t TMVAGui.C\(\"TMVA-3.root\"\)
+    r99t TMVAGui.C\(\"TMVA-4.root\"\)
+    r99t TMVAGui.C\(\"TMVA-5.root\"\)
 
+    r99t TMVAGui.C\(\"TMVA-1-variables.root\"\)
+    r99t TMVAGui.C\(\"TMVA-2-variables.root\"\)
+    r99t TMVAGui.C\(\"TMVA-3-variables.root\"\)
 
+    
 where:
 
     /home/amassiro/Cern/Code/HIG/MUCCA/

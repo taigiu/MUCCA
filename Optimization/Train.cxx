@@ -218,12 +218,17 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  factory->AddVariable( "dphilmet1", 'F' );
  factory->AddVariable( "dphilmet2", 'F' );
  factory->AddVariable( "dphilmet",  'F' );  //---- minimum among the two
+
+ factory->AddVariable( "metPfType1", 'F' );
+//  factory->AddVariable( "mcoll", 'F' );
  
  if (myMethodList != "") {
   factory->AddSpectator( "mth",  'F' );  //---- used in shape analysis, not here
  }
  else {
   factory->AddVariable( "mth",  'F' );  //---- used in shape analysis, not here
+  factory->AddVariable( "mtw1",  'F' );  //---- used in shape analysis, not here
+  factory->AddVariable( "mtw2",  'F' );  //---- used in shape analysis, not here
  }
  
    // You can add so-called "Spectator variables", which are not used in the MVA training,
@@ -240,32 +245,54 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
 //   gSystem->Exec("wget http://root.cern.ch/files/tmva_class_example.root");
    
  TString fname;
-  
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_GluGluHToTauTau_M125.root");
-//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_GluGluHToTauTau_M125.root");
+
+ /** 
+  * Signal
+  */
+ 
+ 
+ 
+ fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_GluGluHToWWTo2L2Nu_M125.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_GluGluHToWWTo2L2Nu_M125.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_GluGluHToWWTo2L2Nu_M125_TEST.root");
  TFile *inputS1 = TFile::Open( fname );
  TTree *signal1 = (TTree*) inputS1->Get("latino");
  
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WWTo2L2Nu.root");
+ /** 
+  * Backgrounds
+  */
+ 
+ fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_WWTo2L2Nu.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WWTo2L2Nu.root");
  TFile *inputB1 = TFile::Open( fname );
  TTree *background1 = (TTree*) inputB1->Get("latino");
  
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_DYJetsToLL_M-10to50.root");
+ fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_DYJetsToLL_M-10to5*.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_DYJetsToLL_M-10to50.root");
  //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-5to50-LO.root");
  TChain *background2 = new TChain("latino");
  background2->Add(fname);
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-50.root");
+ fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_DYJetsToLL_M-50_0*.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-50.root");
  background2->Add(fname);
  
+ fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_TTTo2L2Nu.root");
  //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTJets.root");
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTTo2L2Nu.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_TTTo2L2Nu.root");
  TFile *inputB3 = TFile::Open( fname );
  TTree *background3 = (TTree*) inputB3->Get("latino");
  
- fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WZTo3LNu.root");
+ 
+ fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_Wg_AMCNLOFXFX.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WZTo3LNu.root");
  TFile *inputB4 = TFile::Open( fname );
  TTree *background4 = (TTree*) inputB4->Get("latino");
  
+ fname = Form ("eos/user/a/amassiro/HWW2015/04MarchFake/22Jan_Run2015D_16Dec2015/latino_DD_Run2015D_16Dec2015_MuonEG.root");
+ TFile *inputB5 = TFile::Open( fname );
+ TTree *background5 = (TTree*) inputB5->Get("latino");
+
+
  // --- Register the training and test trees
   
  // global event weights per tree (see below for setting event-wise weights)
@@ -279,10 +306,18 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  if (whichBkg == 2)  factory->AddBackgroundTree( background2, backgroundWeight );
  if (whichBkg == 3)  factory->AddBackgroundTree( background3, backgroundWeight );
  if (whichBkg == 4)  factory->AddBackgroundTree( background4, backgroundWeight );
+ if (whichBkg == 5)  factory->AddBackgroundTree( background5, backgroundWeight );
  
   //---- global weight
- factory->SetWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
-
+ factory->SetSignalWeightExpression("baseW");
+ 
+ if (whichBkg == 1) factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
+ if (whichBkg == 2) factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
+ if (whichBkg == 3) factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
+ if (whichBkg == 4) factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
+//  if (whichBkg == 5) factory->SetBackgroundWeightExpression("trigger*(fakeW2l0j*(njet==0)+fakeW2l1j*(njet==1)+fakeW2l2j*(njet>=2))");
+ if (whichBkg == 5) factory->SetBackgroundWeightExpression("(fakeW2l0j*(njet==0)+fakeW2l1j*(njet==1)+fakeW2l2j*(njet>=2))");
+ 
  
    // --- end of tree registration 
 
@@ -296,8 +331,10 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  //  TCut mycutb = "ch1*ch2<0 && pt2>20 && mpmet>20 && pfmet>20 && mll>12 && nextra==0"; // for example: TCut mycutb = "abs(var1)<0.5";
 
  TCut mycuts = "mll>10 && std_vector_lepton_pt[0]>20 \
-                && std_vector_lepton_pt[1]>10 && (channel==2 || channel==3) \
-               "; 
+                && ptll>30 \
+                && metPfType1>20 \
+                && ( std_vector_jet_pt[0] < 20 || std_vector_jet_cmvav2[0] < -0.715 ) \
+                "; 
  
  
  TCut mycutb = mycuts;
