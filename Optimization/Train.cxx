@@ -211,25 +211,22 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  factory->AddVariable( "std_vector_lepton_pt[0]", 'F' );
  factory->AddVariable( "std_vector_lepton_pt[1]", 'F' );
  factory->AddVariable( "mll", 'F' );
- factory->AddVariable( "dphill", 'F' );
- factory->AddVariable( "yll", 'F' );
- factory->AddVariable( "ptll", 'F' );
+ factory->AddVariable( "mth", 'F' );
+ factory->AddVariable( "abs(detajj)", 'F' );
+ factory->AddVariable( "abs(std_vector_lepton_eta[0]-std_vector_lepton_eta[1])", 'F' );
  
- factory->AddVariable( "dphilmet1", 'F' );
- factory->AddVariable( "dphilmet2", 'F' );
- factory->AddVariable( "dphilmet",  'F' );  //---- minimum among the two
 
- factory->AddVariable( "metPfType1", 'F' );
+// factory->AddVariable( "metPfType1", 'F' );
 //  factory->AddVariable( "mcoll", 'F' );
  
- if (myMethodList != "") {
-  factory->AddSpectator( "mth",  'F' );  //---- used in shape analysis, not here
- }
- else {
-  factory->AddVariable( "mth",  'F' );  //---- used in shape analysis, not here
-  factory->AddVariable( "mtw1",  'F' );  //---- used in shape analysis, not here
-  factory->AddVariable( "mtw2",  'F' );  //---- used in shape analysis, not here
- }
+// if (myMethodList != "") {
+//  factory->AddSpectator( "mth",  'F' );  //---- used in shape analysis, not here
+// }
+// else {
+//  factory->AddVariable( "mth",  'F' );  //---- used in shape analysis, not here
+//  factory->AddVariable( "mtw1",  'F' );  //---- used in shape analysis, not here
+//  factory->AddVariable( "mtw2",  'F' );  //---- used in shape analysis, not here
+// }
  
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
@@ -250,11 +247,15 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
   * Signal
   */
  
+
  
  
- fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_GluGluHToWWTo2L2Nu_M125.root");
-//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_GluGluHToWWTo2L2Nu_M125.root");
-//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_GluGluHToWWTo2L2Nu_M125_TEST.root");
+ fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK.root");
+fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noHiggs.root");
+fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noTop.root");
+fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noTop_noHiggs.root");
+fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_noTop.root");
+fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_QCD_noTop.root");
  TFile *inputS1 = TFile::Open( fname );
  TTree *signal1 = (TTree*) inputS1->Get("latino");
  
@@ -262,7 +263,9 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
   * Backgrounds
   */
  
- fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_WWTo2L2Nu.root");
+ fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_ggH_hww.root");
+ fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_qqH_hww.root");
+
 //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WWTo2L2Nu.root");
  TFile *inputB1 = TFile::Open( fname );
  TTree *background1 = (TTree*) inputB1->Get("latino");
@@ -361,7 +364,7 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  if (Use["Cuts"])
   factory->BookMethod( TMVA::Types::kCuts, "Cuts",
                        "!H:!V:FitMethod=MC:EffSel:SampleSize=200000:VarProp=FSmart" );
-
+/*
  if (Use["CutsD"])
   factory->BookMethod( TMVA::Types::kCuts, "CutsD",
                        "!H:!V:FitMethod=MC:EffSel:SampleSize=200000:VarProp=FSmart:VarTransform=Decorrelate" );
@@ -528,6 +531,8 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
   factory->BookMethod( TMVA::Types::kRuleFit, "RuleFit",
                        "H:!V:RuleFitModule=RFTMVA:Model=ModRuleLinear:MinImp=0.001:RuleMinDist=0.001:NTrees=20:fEventsMin=0.01:fEventsMax=0.5:GDTau=-1.0:GDTauPrec=0.01:GDStep=0.01:GDNSteps=10000:GDErrScale=1.02" );
 
+
+*/
    // For an example of the category classifier usage, see: TMVAClassificationCategory
 
    // --------------------------------------------------------------------------------------------------
