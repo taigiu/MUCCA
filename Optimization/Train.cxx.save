@@ -246,48 +246,54 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  /** 
   * Signal
   */
- 
+TFile *inputS1 = TFile::Open( fname );
 
- 
+ TTree *signal1 = (TTree*) inputS1->Get("latino");
  
 fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK.root");
-TFile *inputS1 = TFile::Open( fname );
-TTree *signal1 = (TTree*) inputS1->Get("latino");
-
 fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noHiggs.root");
-TFile *inputS2 = TFile::Open( fname );
-TTree *signal2 = (TTree*) inputS2->Get("latino");
-
-
 fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noTop.root");
-TFile *inputS3 = TFile::Open( fname );
-TTree *signal3 = (TTree*) inputS3->Get("latino");
-
 fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noTop_noHiggs.root");
-TFile *inputS4 = TFile::Open( fname );
-TTree *signal4 = (TTree*) inputS4->Get("latino");
-
 fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_noTop.root");
-TFile *inputS5 = TFile::Open( fname );
-TTree *signal5 = (TTree*) inputS5->Get("latino");
-
 fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_QCD_noTop.root");
- TFile *inputS6 = TFile::Open( fname );
- TTree *signal6 = (TTree*) inputS6->Get("latino");
+ TFile *inputS1 = TFile::Open( fname );
+ TTree *signal1 = (TTree*) inputS1->Get("latino");
  
  /** 
   * Backgrounds
   */
  
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_ggH_hww.root");
-TFile *inputB2 = TFile::Open( fname );
-TTree *background2 = (TTree*) inputB2->Get("latino");
+ fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_ggH_hww.root");
+ fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_qqH_hww.root");
 
-
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_qqH_hww.root");
-TFile *inputB2 = TFile::Open( fname );
-TTree *background2 = (TTree*) inputB2->Get("latino");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WWTo2L2Nu.root");
+ TFile *inputB1 = TFile::Open( fname );
+ TTree *background1 = (TTree*) inputB1->Get("latino");
  
+// fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_DYJetsToLL_M-10to5*.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_DYJetsToLL_M-10to50.root");
+ //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-5to50-LO.root");
+// TChain *background2 = new TChain("latino");
+// background2->Add(fname);
+// fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_DYJetsToLL_M-50_0*.root");
+//  fname = Form ("/media/data/amassiro/LatinoTree/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_DYJetsToLL_M-50.root");
+// background2->Add(fname);
+ 
+// fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_TTTo2L2Nu.root");
+ //  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel/latino_TTJets.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_TTTo2L2Nu.root");
+// TFile *inputB3 = TFile::Open( fname );
+// TTree *background3 = (TTree*) inputB3->Get("latino");
+ 
+ 
+// fname = Form ("eos/user/r/rebeca/HWW2015/22Jan_25ns_mAODv2_MC/MCl2loose__hadd__bSFL2pTEff__l2tight__wwSel/latino_Wg_AMCNLOFXFX.root");
+//  fname = Form ("/media/data/amassiro/LatinoTrees/25ns/21Oct2015/mcwghtcount__MC__l2sel__hadd__l2sel/latino_WZTo3LNu.root");
+// TFile *inputB4 = TFile::Open( fname );
+// TTree *background4 = (TTree*) inputB4->Get("latino");
+ 
+// fname = Form ("eos/user/a/amassiro/HWW2015/04MarchFake/22Jan_Run2015D_16Dec2015/latino_DD_Run2015D_16Dec2015_MuonEG.root");
+// TFile *inputB5 = TFile::Open( fname );
+// TTree *background5 = (TTree*) inputB5->Get("latino");
 
 
  // --- Register the training and test trees
