@@ -246,45 +246,23 @@ void Train( int whichBkg = 1,  TString myMethodList = "" ) {
  /** 
   * Signal
   */
- 
 
- 
- 
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK.root");
+fname = Form ("/gwteras/cms/store/group/OneLepton/Apr2017_summer16/lepSel__MCWeights__bSFLpTEffMulti__cleanTauMC__l2loose__hadd__l2tightOR__LepTrgFix__dorochester__formulasMC__wwSel//latino_WpWmJJ_EWK_QCD_noTop_noHiggs.root");
 TFile *inputS1 = TFile::Open( fname );
 TTree *signal1 = (TTree*) inputS1->Get("latino");
 
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noHiggs.root");
-TFile *inputS2 = TFile::Open( fname );
-TTree *signal2 = (TTree*) inputS2->Get("latino");
 
-
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noTop.root");
-TFile *inputS3 = TFile::Open( fname );
-TTree *signal3 = (TTree*) inputS3->Get("latino");
-
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_QCD_noTop_noHiggs.root");
-TFile *inputS4 = TFile::Open( fname );
-TTree *signal4 = (TTree*) inputS4->Get("latino");
-
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_EWK_noTop.root");
-TFile *inputS5 = TFile::Open( fname );
-TTree *signal5 = (TTree*) inputS5->Get("latino");
-
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_WpWmJJ_QCD_noTop.root");
- TFile *inputS6 = TFile::Open( fname );
- TTree *signal6 = (TTree*) inputS6->Get("latino");
  
  /** 
   * Backgrounds
   */
  
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_ggH_hww.root");
-TFile *inputB2 = TFile::Open( fname );
-TTree *background2 = (TTree*) inputB2->Get("latino");
+fname = Form ("/gwteras/cms/store/group/OneLepton/Apr2017_summer16/lepSel__MCWeights__bSFLpTEffMulti__cleanTauMC__l2loose__hadd__l2tightOR__LepTrgFix__dorochester__formulasMC__wwSel//latino_VBFHToWWTo2L2Nu_M125.root");
+TFile *inputB1 = TFile::Open( fname );
+TTree *background1 = (TTree*) inputB1->Get("latino");
 
 
-fname = Form ("/gwpool/users/gtaiocchi/CMSSW_8_0_26_patch1/src/PlotsConfigurations/Configurations/VBSWWOS/HiggsOptimization/cleandatas/rootFile/plots_VBSOS_preselections_2j_qqH_hww.root");
+fname = Form ("/gwteras/cms/store/group/OneLepton/Apr2017_summer16/lepSel__MCWeights__bSFLpTEffMulti__cleanTauMC__l2loose__hadd__l2tightOR__LepTrgFix__dorochester__formulasMC__wwSel//latino_VBFHToWWTo2L2Nu_M125.root");
 TFile *inputB2 = TFile::Open( fname );
 TTree *background2 = (TTree*) inputB2->Get("latino");
  
@@ -299,21 +277,14 @@ TTree *background2 = (TTree*) inputB2->Get("latino");
    // You can add an arbitrary number of signal or background trees
  factory->AddSignalTree(    signal1, signalWeight );
 
- if (whichBkg == 1)  factory->AddBackgroundTree( background1, backgroundWeight );
- if (whichBkg == 2)  factory->AddBackgroundTree( background2, backgroundWeight );
- if (whichBkg == 3)  factory->AddBackgroundTree( background3, backgroundWeight );
- if (whichBkg == 4)  factory->AddBackgroundTree( background4, backgroundWeight );
- if (whichBkg == 5)  factory->AddBackgroundTree( background5, backgroundWeight );
+factory->AddBackgroundTree( background1, backgroundWeight );
+factory->AddBackgroundTree( background2, backgroundWeight );
  
   //---- global weight
  factory->SetSignalWeightExpression("baseW");
  
- if (whichBkg == 1) factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
- if (whichBkg == 2) factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
- if (whichBkg == 3) factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
- if (whichBkg == 4) factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
-//  if (whichBkg == 5) factory->SetBackgroundWeightExpression("trigger*(fakeW2l0j*(njet==0)+fakeW2l1j*(njet==1)+fakeW2l2j*(njet>=2))");
- if (whichBkg == 5) factory->SetBackgroundWeightExpression("(fakeW2l0j*(njet==0)+fakeW2l1j*(njet==1)+fakeW2l2j*(njet>=2))");
+factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
+factory->SetBackgroundWeightExpression("baseW*(GEN_weight_SM/abs(GEN_weight_SM))");
  
  
    // --- end of tree registration 
